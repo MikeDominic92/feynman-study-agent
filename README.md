@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Feynman Study Agent
 
-## Getting Started
+An open-source study and exam-prep web app for students who want a tutor that
+checks whether they can explain a concept in simple language.
 
-First, run the development server:
+The first demo packet is a sanitized radiography/radiation-protection course
+covering ALARA, time-distance-shielding, air kerma, absorbed dose, equivalent
+dose, effective dose, dose area product, and population dose.
+
+## What It Does
+
+- Imports class sources locally and keeps real course files out of Git.
+- Turns source chunks into concepts, review cards, quizzes, and Markdown.
+- Coaches a Feynman teach-back loop: explain simply, find gaps, ask one
+  question, and generate targeted practice.
+- Shows source references for source-backed claims.
+- Exports clean Markdown, standalone HTML, and JSON.
+
+## Quick Start
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Safety Defaults
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Real course files are import-only. Do not commit slides, spreadsheets, books,
+screenshots, private notes, or local evidence. The repo includes:
 
-## Learn More
+```bash
+npm run privacy:scan
+npm run guard:no-external
+npm run validate:repo
+npm run precommit:check
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Development
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run lint
+npm run typecheck
+npm run test
+npm run build
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project Shape
 
-## Deploy on Vercel
+- `src/app` - Next.js App Router pages.
+- `src/lib/types.ts` - core data contracts.
+- `src/lib/sample-data.ts` - sanitized demo course packet.
+- `src/lib/feynman.ts` - teach-back scoring and tutor turn logic.
+- `src/lib/ingestion.ts` - local import helpers.
+- `src/lib/exports.ts` - Markdown, HTML, and JSON export helpers.
+- `docs/research-prompt.md` - Deep Research prompt for product and competitor
+  research.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Apache-2.0

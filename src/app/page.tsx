@@ -1,66 +1,103 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import Link from "next/link";
+import { ArrowRight, Brain, FileUp, ShieldCheck, Sparkles } from "lucide-react";
+import { AppShell } from "@/components/AppShell";
+import { MasteryBar } from "@/components/MasteryBar";
+import { SourceRefs } from "@/components/SourceRefs";
+import { radiationPacket } from "@/lib/sample-data";
 
 export default function Home() {
+  const dueCards = radiationPacket.reviewCards.filter((card) =>
+    card.dueAt.startsWith("2026-05-18"),
+  );
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <AppShell>
+      <section className="hero-panel">
+        <div>
+          <p className="eyebrow">Source-grounded exam prep</p>
+          <h1>Teach it simply, then prove you can use it.</h1>
+          <p className="hero-copy">
+            A Feynman-first study cockpit for turning course sources into
+            teach-back loops, exam practice, review cards, and clean Markdown.
           </p>
+          <div className="button-row">
+            <Link className="button primary" href="/tutor">
+              <Brain size={18} aria-hidden="true" />
+              Start tutor loop
+            </Link>
+            <Link className="button secondary" href="/sources">
+              <FileUp size={18} aria-hidden="true" />
+              Import sources
+            </Link>
+          </div>
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div className="study-card">
+          <div className="study-card-header">
+            <Sparkles size={18} aria-hidden="true" />
+            <span>Today</span>
+          </div>
+          <strong>{dueCards.length} review cards due</strong>
+          <p>Focus: air kerma, effective dose, and one ALARA teach-back.</p>
         </div>
-      </main>
-    </div>
+      </section>
+
+      <section className="dashboard-grid">
+        <article className="panel">
+          <div className="panel-heading">
+            <p className="eyebrow">Course</p>
+            <h2>{radiationPacket.course.title}</h2>
+          </div>
+          <p>{radiationPacket.course.description}</p>
+          <div className="focus-list">
+            {radiationPacket.course.examFocus.map((focus) => (
+              <span key={focus}>{focus}</span>
+            ))}
+          </div>
+        </article>
+
+        <article className="panel">
+          <div className="panel-heading">
+            <p className="eyebrow">Privacy</p>
+            <h2>Import-only by default</h2>
+          </div>
+          <p>
+            Public fixtures are sanitized. Real slides, spreadsheets, books, and
+            screenshots are ignored by Git and treated as local-only sources.
+          </p>
+          <div className="status-line">
+            <ShieldCheck size={18} aria-hidden="true" />
+            <span>Privacy scan included</span>
+          </div>
+        </article>
+      </section>
+
+      <section className="panel wide">
+        <div className="panel-heading row-heading">
+          <div>
+            <p className="eyebrow">Concept mastery</p>
+            <h2>Radiation protection map</h2>
+          </div>
+          <Link className="inline-link" href="/courses/mi-120-radiation-protection">
+            Open map
+            <ArrowRight size={16} aria-hidden="true" />
+          </Link>
+        </div>
+        <div className="concept-table">
+          {radiationPacket.concepts.map((concept) => (
+            <article className="concept-row" key={concept.id}>
+              <div>
+                <h3>{concept.title}</h3>
+                <p>{concept.plainLanguage}</p>
+                <SourceRefs refs={concept.sourceRefs} />
+              </div>
+              <div className="mastery-cell">
+                <strong>{Math.round(concept.mastery * 100)}%</strong>
+                <MasteryBar value={concept.mastery} />
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    </AppShell>
   );
 }
