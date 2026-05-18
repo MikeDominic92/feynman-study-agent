@@ -44,11 +44,13 @@ export async function getCoursePacket(courseId: string): Promise<CoursePacket> {
   const chunks = all<Row>(db, "SELECT * FROM chunks ORDER BY order_index ASC").map(
     rowToChunk,
   );
-  const concepts = all<Row>(
+  const concepts = mergeConceptsByTitle(
+    all<Row>(
     db,
     "SELECT * FROM concepts WHERE course_id = $courseId ORDER BY title ASC",
     { $courseId: courseId },
-  ).map(rowToConcept);
+    ).map(rowToConcept),
+  );
   const quizItems = all<Row>(
     db,
     "SELECT * FROM quiz_items WHERE course_id = $courseId ORDER BY id ASC",
@@ -592,6 +594,54 @@ function rowToSession(row: Row): StudySession {
     completedItemIds: parseJson(row.completed_item_ids, []),
     unresolvedGapIds: parseJson(row.unresolved_gap_ids, []),
   };
+}
+
+function mergeConceptsByTitle(concepts: Concept[]) {
+  const merged = new Map<string, Concept>();
+
+  for (const concept of concepts) {
+    const key = concept.title.trim().toLowerCase();
+    const existing = merged.get(key);
+
+    if (!existing) {
+      merged.set(key, {
+        ...concept,
+        prerequisites: uniqueStrings(concept.prerequisites),
+        sourceRefs: uniqueRefs(concept.sourceRefs),
+      });
+      continue;
+    }
+
+    merged.set(key, {
+      ...existing,
+      mastery: Math.max(existing.mastery, concept.mastery),
+      prerequisites: uniqueStrings([
+        ...existing.prerequisites,
+        ...concept.prerequisites,
+      ]),
+      sourceRefs: uniqueRefs([...existing.sourceRefs, ...concept.sourceRefs]),
+    });
+  }
+
+  return Array.from(merged.values()).sort((a, b) =>
+    a.title.localeCompare(b.title),
+  );
+}
+
+function uniqueStrings(values: string[]) {
+  return Array.from(new Set(values));
+}
+
+function uniqueRefs(refs: Concept["sourceRefs"]) {
+  const seen = new Set<string>();
+  return refs.filter((ref) => {
+    const key = `${ref.sourceId}:${ref.chunkId ?? ""}:${ref.locator}`;
+    if (seen.has(key)) {
+      return false;
+    }
+    seen.add(key);
+    return true;
+  });
 }
 
 function json(value: unknown) {

@@ -49,6 +49,11 @@ describe("SQLite storage", () => {
     expect(artifacts.concepts.map((concept) => concept.title)).toContain("ALARA");
     expect(updated.sources.some((item) => item.id === source.id)).toBe(true);
     expect(updated.chunks.some((item) => item.sourceId === source.id)).toBe(true);
+    const alaraConcepts = updated.concepts.filter((item) => item.title === "ALARA");
+    expect(alaraConcepts).toHaveLength(1);
+    expect(
+      alaraConcepts[0].sourceRefs.some((ref) => ref.sourceId === source.id),
+    ).toBe(true);
     expect(updated.quizItems.some((item) => item.id.startsWith("quiz-src-storage-test"))).toBe(
       true,
     );
