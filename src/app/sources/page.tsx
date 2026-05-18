@@ -1,9 +1,14 @@
 import { FileText, FileUp, LockKeyhole, Table2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { radiationPacket } from "@/lib/sample-data";
+import { SourceImporter } from "@/components/SourceImporter";
 import { supportedImports } from "@/lib/ingestion";
+import { getDefaultCoursePacket } from "@/lib/storage";
 
-export default function SourcesPage() {
+export const dynamic = "force-dynamic";
+
+export default async function SourcesPage() {
+  const packet = await getDefaultCoursePacket();
+
   return (
     <AppShell>
       <section className="page-header">
@@ -19,13 +24,8 @@ export default function SourcesPage() {
         <article className="upload-panel">
           <FileUp size={24} aria-hidden="true" />
           <h2>Local import lane</h2>
-          <p>PPTX, spreadsheets, PDFs, documents, Markdown, and text.</p>
-          <input
-            aria-label="Import course files"
-            type="file"
-            multiple
-            accept=".pptx,.xlsx,.xls,.pdf,.docx,.md,.markdown,.txt"
-          />
+          <p>PPTX, XLSX, Markdown, and text are parsed locally into chunks.</p>
+          <SourceImporter />
         </article>
         <article className="panel">
           <div className="panel-heading">
@@ -70,12 +70,13 @@ export default function SourcesPage() {
           <h2>Current packet</h2>
         </div>
         <div className="source-grid">
-          {radiationPacket.sources.map((source) => (
+          {packet.sources.map((source) => (
             <article key={source.id} className="source-tile">
               <FileText size={19} aria-hidden="true" />
               <h3>{source.title}</h3>
               <p>{source.summary}</p>
               <span>{source.kind}</span>
+              <small>{source.privacy}</small>
             </article>
           ))}
         </div>

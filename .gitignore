@@ -33,6 +33,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # local course imports and private study material
 /imports/
@@ -43,6 +44,10 @@ yarn-error.log*
 /evidence/
 /screenshots/
 /exports/private/
+/data/
+*.sqlite
+*.sqlite3
+*.db
 *.pptx
 *.xlsx
 *.xls

@@ -1,16 +1,19 @@
 import { Code2, FileJson, FileText } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { radiationPacket } from "@/lib/sample-data";
 import {
   exportCourseHtml,
   exportCourseJson,
   exportCourseMarkdown,
 } from "@/lib/exports";
+import { getDefaultCoursePacket } from "@/lib/storage";
 
-export default function ExportsPage() {
-  const markdown = exportCourseMarkdown(radiationPacket);
-  const html = exportCourseHtml(radiationPacket);
-  const json = exportCourseJson(radiationPacket);
+export const dynamic = "force-dynamic";
+
+export default async function ExportsPage() {
+  const packet = await getDefaultCoursePacket();
+  const markdown = exportCourseMarkdown(packet);
+  const html = exportCourseHtml(packet);
+  const json = exportCourseJson(packet);
 
   return (
     <AppShell>

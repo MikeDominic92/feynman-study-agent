@@ -45,6 +45,7 @@ a {
 
 button,
 input,
+select,
 textarea {
   font: inherit;
 }
@@ -561,14 +562,31 @@ button {
   font-weight: 700;
 }
 
+.composer select,
 .composer textarea {
-  min-height: 150px;
-  resize: vertical;
+  width: 100%;
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 14px;
   color: var(--ink);
   background: #ffffff;
+}
+
+.composer textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+.upload-control {
+  display: grid;
+  gap: 12px;
+}
+
+.upload-control p,
+.form-note {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 .coach-panel {

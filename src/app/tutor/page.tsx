@@ -1,13 +1,17 @@
-import { MessageCircle, Mic2, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { SourceRefs } from "@/components/SourceRefs";
-import { radiationPacket } from "@/lib/sample-data";
+import { TutorConsole } from "@/components/TutorConsole";
+import { getDefaultCoursePacket } from "@/lib/storage";
 
-export default function TutorPage() {
-  const attempt = radiationPacket.attempts[0];
-  const concept = radiationPacket.concepts.find(
-    (item) => item.id === attempt.conceptId,
-  );
+export const dynamic = "force-dynamic";
+
+export default async function TutorPage() {
+  const packet = await getDefaultCoursePacket();
+  const attempt = packet.attempts[0];
+  const turn = packet.tutorTurns[0];
+  const concept = packet.concepts.find(
+    (item) => item.id === attempt?.conceptId,
+  ) ?? packet.concepts[0];
 
   return (
     <AppShell>
@@ -21,40 +25,22 @@ export default function TutorPage() {
       </section>
 
       <section className="tutor-layout">
-        <article className="chat-panel">
-          <div className="chat-bubble student">
-            <span>Student teach-back</span>
-            <p>{attempt.studentExplanation}</p>
-          </div>
-          <div className="chat-bubble tutor">
-            <span>Feynman coach</span>
-            <p>{radiationPacket.tutorTurns[0].content}</p>
-            <SourceRefs refs={radiationPacket.tutorTurns[0].sourceRefs} />
-          </div>
-          <form className="composer">
-            <Mic2 size={18} aria-hidden="true" />
-            <label htmlFor="teach-back">Teach it in one simple paragraph</label>
-            <textarea
-              id="teach-back"
-              placeholder="Use your own words. Avoid filler. Add one because."
-            />
-            <button className="button primary" type="button">
-              <MessageCircle size={18} aria-hidden="true" />
-              Check teach-back
-            </button>
-          </form>
-        </article>
+        <TutorConsole
+          concepts={packet.concepts}
+          initialAttempt={attempt}
+          initialTurn={turn}
+        />
 
         <aside className="panel coach-panel">
           <div className="score-ring">
             <Sparkles size={22} aria-hidden="true" />
-            <strong>{attempt.simpleScore}</strong>
+            <strong>{attempt?.simpleScore ?? 0}</strong>
             <span>simple score</span>
           </div>
           <h2>{concept?.title}</h2>
           <p>{concept?.whyItMatters}</p>
           <div className="gap-list">
-            {attempt.gapNotes.map((gap) => (
+            {(attempt?.gapNotes ?? ["Import a source or run a teach-back to log gaps."]).map((gap) => (
               <span key={gap}>{gap}</span>
             ))}
           </div>

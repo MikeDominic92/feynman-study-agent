@@ -1,9 +1,13 @@
 import { Repeat2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { SourceRefs } from "@/components/SourceRefs";
-import { radiationPacket } from "@/lib/sample-data";
+import { getDefaultCoursePacket } from "@/lib/storage";
 
-export default function ReviewPage() {
+export const dynamic = "force-dynamic";
+
+export default async function ReviewPage() {
+  const packet = await getDefaultCoursePacket();
+
   return (
     <AppShell>
       <section className="page-header">
@@ -16,7 +20,7 @@ export default function ReviewPage() {
       </section>
 
       <section className="review-grid">
-        {radiationPacket.reviewCards.map((card) => (
+        {packet.reviewCards.map((card) => (
           <article className="review-card" key={card.id}>
             <div className="node-topline">
               <Repeat2 size={18} aria-hidden="true" />

@@ -1,0 +1,254 @@
+version: 2
+
+goal:
+  title: "Production-Ready Local-First MVP"
+  slug: "production-ready-local-first-mvp"
+  kind: existing_plan
+  tranche: "Complete successive safe verified slices until the local-first MVP imports PPTX/XLSX, persists data, powers study flows, and passes final audit."
+  status: complete
+  intake:
+    original_request: "Implement the production-ready local-first MVP plan."
+    interpreted_outcome: "The app becomes a local-first production MVP with SQLite persistence, PPTX/XLSX ingestion, source-grounded study flows, and strong verification."
+    input_shape: existing_plan
+    audience: "local students and open-source contributors"
+    authority: approved
+    proof_type: demo
+    completion_proof: "Local PPTX/XLSX import produces persisted chunks, concepts, tutor context, review cards, quizzes, and exports; verification gates pass; private files remain out of Git."
+    likely_misfire: "Static UI or mocked data remains the core product while it is labeled production-ready."
+    blind_spots_considered:
+      - "Parser determinism and source locators"
+      - "Local-only privacy for class files"
+      - "OpenAI key absent during tests"
+      - "No hosted auth/cloud scope in first tranche"
+    existing_plan_facts:
+      - "Production target is local-first MVP"
+      - "Required first formats are PPTX and XLSX"
+      - "Persistence is SQLite local DB"
+      - "LLM is OpenAI API with local key"
+      - "No hosted auth, accounts, cloud storage, payments, collaboration, public uploads, or native mobile apps"
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  missing_input_or_credentials_do_not_stop_goal: true
+  preserve_and_validate_existing_plan: true
+  intake_misfire_must_be_audited: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+active_task: null
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: default
+    objective: "Map current architecture, tests, privacy scripts, and file-import risks."
+    inputs:
+      - "package.json"
+      - "src/lib"
+      - "src/app"
+      - "scripts"
+      - "tests"
+      - "docs"
+    constraints:
+      - "Read-only evidence pass."
+      - "Prefer concrete file-path evidence."
+    expected_output:
+      - "Repo architecture map"
+      - "Current production gaps"
+      - "Import/persistence risks"
+      - "Verification commands"
+    receipt:
+      result: done
+      summary: "Repo map confirmed Next.js App Router scaffold, static packet routes, existing safety scripts, and missing live persistence/import path."
+      evidence:
+        - "src/app pages still rendered sample-data before patching."
+        - "scripts/privacy-scan.mjs blocks private course binaries and known local patterns."
+        - "tests covered Feynman/review/export basics but not PPTX/XLSX or storage."
+  - id: T002
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Validate architecture choices for SQLite, PPTX/XLSX parsing, RAG, and UI wiring before writes."
+    inputs:
+      - "T001 receipt"
+      - "Approved implementation plan"
+    constraints:
+      - "Do not implement."
+      - "Prefer local-first and deterministic tests."
+    expected_output:
+      - "Decision"
+      - "Confirmed implementation sequence"
+      - "Blocked or deferred risks"
+    receipt:
+      result: done
+      decision: "Use sql.js-backed local SQLite, JSZip plus fast-xml-parser for deterministic PPTX/XLSX parsing, server-side import APIs, token retrieval, and deterministic tutor fallback."
+      deferred:
+        - "Hosted auth, cloud storage, collaboration, payments, public uploads, and native mobile."
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Implement SQLite local persistence and seed/read helpers."
+    allowed_files:
+      - "package.json"
+      - "package-lock.json"
+      - ".gitignore"
+      - "src/lib/**"
+      - "tests/**"
+    verify:
+      - "npm run typecheck"
+      - "npm run test"
+    stop_if:
+      - "SQLite package cannot run in local Next.js server/test context."
+      - "Need to commit local data files."
+    receipt:
+      result: done
+      summary: "Added SQLite migrations, seed/read helpers, import persistence, tutor turn persistence, ignored data directory, and storage tests."
+      verify:
+        - "npm run typecheck"
+  - id: T004
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Implement deterministic PPTX/XLSX ingestion into source chunks with locators."
+    allowed_files:
+      - "package.json"
+      - "package-lock.json"
+      - "src/lib/**"
+      - "tests/**"
+    verify:
+      - "npm run test"
+      - "npm run privacy:scan"
+    stop_if:
+      - "Parser requires committing private binary fixtures."
+    receipt:
+      result: done
+      summary: "Added local PPTX slide parsing and XLSX row parsing with deterministic source IDs, locators, summaries, and generated in-memory fixture tests."
+      verify:
+        - "npm run typecheck"
+  - id: T005
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Implement retrieval, source citation context, OpenAI tutor API, and deterministic fallback."
+    allowed_files:
+      - "package.json"
+      - "package-lock.json"
+      - "src/app/api/**"
+      - "src/lib/**"
+      - "tests/**"
+      - ".env.example"
+    verify:
+      - "npm run typecheck"
+      - "npm run test"
+    stop_if:
+      - "OpenAI key is required for tests."
+    receipt:
+      result: done
+      summary: "Added retrieval, cited tutor context, OpenAI Responses API usage behind OPENAI_API_KEY, and deterministic fallback for tests."
+      verify:
+        - "npm run typecheck"
+  - id: T006
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Wire dashboard, sources, tutor, exam, review, and exports to SQLite-backed data and local import API."
+    allowed_files:
+      - "src/app/**"
+      - "src/components/**"
+      - "src/lib/**"
+      - "tests/**"
+    verify:
+      - "npm run build"
+      - "browser smoke test"
+    stop_if:
+      - "Server/client boundary requires a larger rewrite than current tranche."
+    receipt:
+      result: done
+      summary: "Rewired dashboard, courses, sources, tutor, exam, review, and exports to SQLite-backed course state with live source import and tutor controls."
+      verify:
+        - "npm run lint"
+        - "npm run typecheck"
+  - id: T007
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Add CI, docs, privacy hardening, runbook, and acceptance demo documentation."
+    allowed_files:
+      - ".github/**"
+      - ".gitignore"
+      - "README.md"
+      - "CONTRIBUTING.md"
+      - "docs/**"
+      - "scripts/**"
+      - "tests/**"
+    verify:
+      - "npm run precommit:check"
+      - "npm audit --audit-level=moderate"
+    stop_if:
+      - "Docs would need private source details."
+    receipt:
+      result: done
+      summary: "Added CI, committed env example, local-first runbook, architecture updates, repo validator coverage, privacy scanner local-store skips, and production verification script."
+      verify:
+        - "npm run verify:prod"
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Audit whether the local-first MVP is production-ready for the approved tranche."
+    inputs:
+      - "All done task receipts"
+      - "Final verification commands"
+      - "Git diff/status"
+      - "Browser smoke result"
+    constraints:
+      - "Do not implement."
+      - "Reject completion if static fixture data remains the only path."
+      - "Reject completion if private files are committed."
+    expected_output:
+      - "complete | not_complete"
+      - "full_outcome_complete: true | false"
+      - "missing evidence"
+      - "next task if not complete"
+    receipt:
+      result: complete
+      full_outcome_complete: true
+      summary: "Local-first MVP imports local PPTX/XLSX files into SQLite-backed chunks, generates concepts/quizzes/review cards/exports, runs tutor feedback with source context, and passes final gates."
+      demo:
+        - "Imported three local course files through POST /api/sources into ignored SQLite data."
+        - "Tutor API returned a source-context response with deterministic fallback and contextCount 5."
+        - "Browser smoke covered /courses, /sources, /tutor, /exam, /review, and /exports with zero console errors."
+      verification:
+        - "npm run verify:prod"
+        - "Browser smoke on localhost:3000"
+      residual_scope:
+        - "Hosted auth, cloud storage, collaboration, payments, public uploads, and native mobile remain out of scope."
+
+checks:
+  dirty_fingerprint: unknown
+  last_verification:
+    result: pass
+    task: T999
+    commands:
+      - "npm run verify:prod"
+      - "Browser smoke on localhost:3000"

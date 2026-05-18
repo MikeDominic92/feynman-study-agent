@@ -2,20 +2,23 @@ import Link from "next/link";
 import { ArrowRight, BookOpen, CircleCheck, Layers3 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { MasteryBar } from "@/components/MasteryBar";
-import { radiationPacket } from "@/lib/sample-data";
+import { getDefaultCoursePacket } from "@/lib/storage";
 
-export default function CoursesPage() {
+export const dynamic = "force-dynamic";
+
+export default async function CoursesPage() {
+  const packet = await getDefaultCoursePacket();
   const averageMastery =
-    radiationPacket.concepts.reduce((sum, concept) => sum + concept.mastery, 0) /
-    radiationPacket.concepts.length;
+    packet.concepts.reduce((sum, concept) => sum + concept.mastery, 0) /
+    Math.max(1, packet.concepts.length);
 
   return (
     <AppShell>
       <section className="page-header">
         <p className="eyebrow">Courses</p>
-        <h1>{radiationPacket.course.title}</h1>
+        <h1>{packet.course.title}</h1>
         <p>
-          One course packet, two sanitized source groups, and five exam-facing
+          One local-first course packet, source-backed chunks, and exam-facing
           concepts ready for teach-back practice.
         </p>
       </section>
@@ -23,12 +26,12 @@ export default function CoursesPage() {
       <section className="dashboard-grid three">
         <article className="metric-panel">
           <BookOpen size={20} aria-hidden="true" />
-          <strong>{radiationPacket.sources.length}</strong>
+          <strong>{packet.sources.length}</strong>
           <span>source groups</span>
         </article>
         <article className="metric-panel">
           <Layers3 size={20} aria-hidden="true" />
-          <strong>{radiationPacket.concepts.length}</strong>
+          <strong>{packet.concepts.length}</strong>
           <span>concepts</span>
         </article>
         <article className="metric-panel">
@@ -44,13 +47,13 @@ export default function CoursesPage() {
             <p className="eyebrow">Active packet</p>
             <h2>Radiation protection foundation</h2>
           </div>
-          <Link className="inline-link" href="/courses/mi-120-radiation-protection">
+          <Link className="inline-link" href={`/courses/${packet.course.id}`}>
             Open course
             <ArrowRight size={16} aria-hidden="true" />
           </Link>
         </div>
         <div className="course-strip">
-          {radiationPacket.concepts.map((concept) => (
+          {packet.concepts.map((concept) => (
             <article key={concept.id}>
               <h3>{concept.title}</h3>
               <p>{concept.plainLanguage}</p>

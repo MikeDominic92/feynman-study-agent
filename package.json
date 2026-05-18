@@ -17,18 +17,24 @@
     "privacy:scan": "node scripts/privacy-scan.mjs",
     "guard:no-external": "node scripts/no-write-guard.mjs",
     "validate:repo": "node scripts/repo-validator.mjs",
-    "precommit:check": "npm run privacy:scan && npm run guard:no-external && npm run validate:repo && npm run lint && npm run typecheck && npm run test"
+    "precommit:check": "npm run privacy:scan && npm run guard:no-external && npm run validate:repo && npm run lint && npm run typecheck && npm run test",
+    "verify:prod": "npm run precommit:check && npm run build && npm audit --audit-level=moderate"
   },
   "dependencies": {
+    "fast-xml-parser": "^5.8.0",
+    "jszip": "^3.10.1",
     "lucide-react": "^1.16.0",
     "next": "16.2.6",
+    "openai": "^6.38.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "sql.js": "^1.14.1"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/sql.js": "^1.4.11",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "typescript": "^5",

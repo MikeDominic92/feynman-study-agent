@@ -1,9 +1,13 @@
 import { CheckCircle2, ClipboardCheck } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { SourceRefs } from "@/components/SourceRefs";
-import { radiationPacket } from "@/lib/sample-data";
+import { getDefaultCoursePacket } from "@/lib/storage";
 
-export default function ExamPage() {
+export const dynamic = "force-dynamic";
+
+export default async function ExamPage() {
+  const packet = await getDefaultCoursePacket();
+
   return (
     <AppShell>
       <section className="page-header">
@@ -16,7 +20,7 @@ export default function ExamPage() {
       </section>
 
       <section className="exam-list">
-        {radiationPacket.quizItems.map((item, index) => (
+        {packet.quizItems.map((item, index) => (
           <article className="exam-item" key={item.id}>
             <div className="exam-number">
               <ClipboardCheck size={18} aria-hidden="true" />

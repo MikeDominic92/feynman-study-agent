@@ -3,12 +3,15 @@ import { ArrowRight, Brain, FileUp, ShieldCheck, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { MasteryBar } from "@/components/MasteryBar";
 import { SourceRefs } from "@/components/SourceRefs";
-import { radiationPacket } from "@/lib/sample-data";
+import { getDefaultCoursePacket } from "@/lib/storage";
 
-export default function Home() {
-  const dueCards = radiationPacket.reviewCards.filter((card) =>
-    card.dueAt.startsWith("2026-05-18"),
-  );
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const packet = await getDefaultCoursePacket();
+  const dueCards = packet.reviewCards.filter((card) => card.intervalDays <= 1);
+
+  const focus = packet.concepts[0]?.title ?? "source import";
 
   return (
     <AppShell>
@@ -37,7 +40,7 @@ export default function Home() {
             <span>Today</span>
           </div>
           <strong>{dueCards.length} review cards due</strong>
-          <p>Focus: air kerma, effective dose, and one ALARA teach-back.</p>
+          <p>Focus: {focus} teach-back and the newest source-backed gaps.</p>
         </div>
       </section>
 
@@ -45,11 +48,11 @@ export default function Home() {
         <article className="panel">
           <div className="panel-heading">
             <p className="eyebrow">Course</p>
-            <h2>{radiationPacket.course.title}</h2>
+            <h2>{packet.course.title}</h2>
           </div>
-          <p>{radiationPacket.course.description}</p>
+          <p>{packet.course.description}</p>
           <div className="focus-list">
-            {radiationPacket.course.examFocus.map((focus) => (
+            {packet.course.examFocus.map((focus) => (
               <span key={focus}>{focus}</span>
             ))}
           </div>
@@ -83,7 +86,7 @@ export default function Home() {
           </Link>
         </div>
         <div className="concept-table">
-          {radiationPacket.concepts.map((concept) => (
+          {packet.concepts.map((concept) => (
             <article className="concept-row" key={concept.id}>
               <div>
                 <h3>{concept.title}</h3>

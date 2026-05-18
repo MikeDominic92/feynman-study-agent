@@ -2,7 +2,22 @@ import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 
 const root = process.cwd();
-const skipDirs = new Set([".git", ".next", "node_modules", "coverage", "out", "build"]);
+const skipDirs = new Set([
+  ".git",
+  ".next",
+  "node_modules",
+  "coverage",
+  "out",
+  "build",
+  "data",
+  "imports",
+  "local-imports",
+  "local-sources",
+  "course-files",
+  "private",
+  "evidence",
+  "screenshots",
+]);
 const blockedExtensions = new Set([".pptx", ".xlsx", ".xls", ".pdf", ".docx", ".odt", ".pages", ".key"]);
 const blockedContent = [
   /C:\\Users\\jae2j\\Downloads/i,

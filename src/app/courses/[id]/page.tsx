@@ -4,11 +4,9 @@ import { ArrowRight, Brain, FileText } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { MasteryBar } from "@/components/MasteryBar";
 import { SourceRefs } from "@/components/SourceRefs";
-import { radiationPacket } from "@/lib/sample-data";
+import { getCoursePacket, getDefaultCourseId } from "@/lib/storage";
 
-export function generateStaticParams() {
-  return [{ id: radiationPacket.course.id }];
-}
+export const dynamic = "force-dynamic";
 
 export default async function CourseDetailPage({
   params,
@@ -17,20 +15,21 @@ export default async function CourseDetailPage({
 }) {
   const { id } = await params;
 
-  if (id !== radiationPacket.course.id) {
+  if (id !== getDefaultCourseId()) {
     notFound();
   }
+  const packet = await getCoursePacket(id);
 
   return (
     <AppShell>
       <section className="page-header">
         <p className="eyebrow">Concept map</p>
-        <h1>{radiationPacket.course.title}</h1>
-        <p>{radiationPacket.course.description}</p>
+        <h1>{packet.course.title}</h1>
+        <p>{packet.course.description}</p>
       </section>
 
       <section className="concept-map">
-        {radiationPacket.concepts.map((concept) => (
+        {packet.concepts.map((concept) => (
           <article className="map-node" key={concept.id}>
             <div className="node-topline">
               <Brain size={18} aria-hidden="true" />
@@ -56,7 +55,7 @@ export default async function CourseDetailPage({
           </Link>
         </div>
         <div className="source-grid">
-          {radiationPacket.sources.map((source) => (
+          {packet.sources.map((source) => (
             <article key={source.id} className="source-tile">
               <FileText size={19} aria-hidden="true" />
               <h3>{source.title}</h3>
